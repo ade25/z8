@@ -15,7 +15,7 @@ acl purge {
 }
 
 sub vcl_recv {
-    set req.backend_hint = balancer.backend();
+    set req.backend_hint = balancer;
 
     if (req.request == "PURGE") {
         if (!client.ip ~ purge) {
