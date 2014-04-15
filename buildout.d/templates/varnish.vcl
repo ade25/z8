@@ -17,14 +17,14 @@ acl purge {
 sub vcl_recv {
     set req.backend_hint = balancer;
 
-    if (req.request == "PURGE") {
+    if (req.method == "PURGE") {
         if (!client.ip ~ purge) {
-                error 405 "Not allowed.";
+            return(synth(405, "Not allowed."));
         }
         ban_url(req.url);
         error 200 "Purged";
     }
-    if (req.request != "GET" && req.request != "HEAD") {
+    if (req.method != "GET" && req.method != "HEAD") {
         # We only deal with GET and HEAD by default
         return(pass);
     }
