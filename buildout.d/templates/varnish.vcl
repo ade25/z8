@@ -61,13 +61,13 @@ sub vcl_backend_response {
         set beresp.ttl = 120s;
         return (deliver);
     }
-    if (!req.http.X-Anonymous && !beresp.http.Cache-Control ~ "public") {
+    if (!bereq.http.X-Anonymous && !beresp.http.Cache-Control ~ "public") {
         set beresp.http.X-Varnish-Action = "FETCH (pass - authorized and no public cache control)";
         set beresp.uncacheable = true;
         set beresp.ttl = 120s;
         return (deliver);
     }
-    if (req.http.X-Anonymous && !beresp.http.Cache-Control) {
+    if (bereq.http.X-Anonymous && !beresp.http.Cache-Control) {
         set beresp.ttl = 10s;
         set beresp.http.X-Varnish-Action = "FETCH (override - backend not setting cache control)";
     } else {
