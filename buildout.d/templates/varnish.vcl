@@ -15,7 +15,6 @@ acl purge {
 }
 
 sub vcl_recv {
-    set req.grace = 10m;
     set req.backend_hint = balancer.backend();
 
     if (req.request == "PURGE") {
@@ -35,6 +34,7 @@ sub vcl_recv {
 }
 
 sub vcl_backend_response {
+    set beresp.grace = 10m;
     if (!beresp.ttl > 0s) {
         set beresp.http.X-Varnish-Action = "FETCH (pass - not cacheable)";
         return(hit_for_pass);
