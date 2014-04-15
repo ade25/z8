@@ -13,6 +13,7 @@ backend balancer {
         .timeout = 1 s;
         .window = 5;
         .threshold = 3;
+    }
 }
 
 # Only allow PURGE from localhost
@@ -56,15 +57,21 @@ sub vcl_backend_response {
     }
     if (beresp.http.Set-Cookie) {
         set beresp.http.X-Varnish-Action = "FETCH (pass - response sets cookie)";
-        return(hit_for_pass);
+        set beresp.uncacheable = true;
+        set beresp.ttl = 120s;
+        return (deliver);
     }
     if (!beresp.http.Cache-Control ~ "s-maxage=[1-9]" && beresp.http.Cache-Control ~ "(private|no-cache|no-store)") {
         set beresp.http.X-Varnish-Action = "FETCH (pass - response sets private/no-cache/no-store token)";
-        return(hit_for_pass);
+        set beresp.uncacheable = true;
+        set beresp.ttl = 120s;
+        return (deliver);
     }
     if (!req.http.X-Anonymous && !beresp.http.Cache-Control ~ "public") {
         set beresp.http.X-Varnish-Action = "FETCH (pass - authorized and no public cache control)";
-        return(hit_for_pass);
+        set beresp.uncacheable = true;
+        set beresp.ttl = 120s;
+        return (deliver);
     }
     if (req.http.X-Anonymous && !beresp.http.Cache-Control) {
         set beresp.ttl = 10s;
