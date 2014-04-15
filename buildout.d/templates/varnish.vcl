@@ -89,11 +89,11 @@ sub vcl_deliver {
 sub normalize_accept_encoding {
     if (req.http.Accept-Encoding) {
         if (req.url ~ "\.(jpe?g|png|gif|swf|pdf|gz|tgz|bz2|tbz|zip)$" || req.url ~ "/image_[^/]*$") {
-            remove req.http.Accept-Encoding;
+            unset req.http.Accept-Encoding;
         } elsif (req.http.Accept-Encoding ~ "gzip") {
             set req.http.Accept-Encoding = "gzip";
         } else {
-            remove req.http.Accept-Encoding;
+            unset req.http.Accept-Encoding;
         }
     }
 }
