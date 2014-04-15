@@ -7,6 +7,12 @@ backend balancer {
     .connect_timeout = 0.4s;
     .first_byte_timeout = 300s;
     .between_bytes_timeout = 60s;
+    .probe = {
+        .url = "/";
+        .interval = 5s;
+        .timeout = 1 s;
+        .window = 5;
+        .threshold = 3;
 }
 
 # Only allow PURGE from localhost
@@ -16,6 +22,12 @@ acl purge {
 
 sub vcl_recv {
     set req.backend_hint = balancer;
+
+    if (! req.backend.healthy) {
+        set req.grace = 30m;
+    } else {
+       set req.grace = 15s;
+    }
 
     if (req.method == "PURGE") {
         if (!client.ip ~ purge) {
@@ -38,7 +50,9 @@ sub vcl_backend_response {
     set beresp.grace = 10m;
     if (!beresp.ttl > 0s) {
         set beresp.http.X-Varnish-Action = "FETCH (pass - not cacheable)";
-        return(hit_for_pass);
+        set beresp.uncacheable = true;
+        set beresp.ttl = 120s;
+        return (deliver);
     }
     if (beresp.http.Set-Cookie) {
         set beresp.http.X-Varnish-Action = "FETCH (pass - response sets cookie)";
