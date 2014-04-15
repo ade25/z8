@@ -7,13 +7,6 @@ backend balancer {
     .connect_timeout = 0.4s;
     .first_byte_timeout = 300s;
     .between_bytes_timeout = 60s;
-    .probe = {
-        .url = "/";
-        .interval = 5s;
-        .timeout = 1 s;
-        .window = 5;
-        .threshold = 3;
-    }
 }
 
 # Only allow PURGE from localhost
