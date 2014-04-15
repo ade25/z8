@@ -21,8 +21,9 @@ sub vcl_recv {
         if (!client.ip ~ purge) {
             return(synth(405, "Not allowed."));
         }
-        ban_url(req.url);
-        error 200 "Purged";
+        ban("req.http.host == " + req.http.host +
+                      "&& req.url == " + req.url);
+        return(synth(200, "Ban added"));
     }
     if (req.method != "GET" && req.method != "HEAD") {
         # We only deal with GET and HEAD by default
