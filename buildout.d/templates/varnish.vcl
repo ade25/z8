@@ -23,7 +23,6 @@ acl purge {
 
 sub vcl_recv {
     set req.backend_hint = balancer;
-    set req.grace = 30m;
 
     if (req.method == "PURGE") {
         if (!client.ip ~ purge) {
