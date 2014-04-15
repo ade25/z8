@@ -1,13 +1,4 @@
-# VCL file optimized for plone.app.caching.  See vcl(7) for details
-
-# This is an example of a split view caching setup with another proxy
-# like Apache in front of Varnish to rewrite urls into the VHM style.
-
-# Also assumes a single backend behind Varnish (which could be a single
-# zope instance or a load balancer serving multiple zeo clients).
-# To change this to support multiple backends, see the vcl man pages
-# for instructions.
-
+vcl 4.0;
 
 # Configure balancer server as back end
 backend balancer {
@@ -25,8 +16,8 @@ acl purge {
 
 sub vcl_recv {
     set req.grace = 10m;
-    set req.backend = balancer;
-    
+    set req.backend_hint = balancer.backend();
+
     if (req.request == "PURGE") {
         if (!client.ip ~ purge) {
                 error 405 "Not allowed.";
@@ -40,10 +31,10 @@ sub vcl_recv {
     }
     call normalize_accept_encoding;
     call annotate_request;
-    return(lookup);
+    return(hash);
 }
 
-sub vcl_fetch {
+sub vcl_backend_response {
     if (!beresp.ttl > 0s) {
         set beresp.http.X-Varnish-Action = "FETCH (pass - not cacheable)";
         return(hit_for_pass);
