@@ -29,13 +29,17 @@ sub vcl_recv {
         # We only deal with GET and HEAD by default
         return(pass);
     }
+    if (req.http.host ~ "^(.*\.)?coraggio\.de$" || reg.http.host ~ "^(.*\.)?kreativkombinat.de$") {
+        # We do not cache sites in development
+        return(pass);
+    }
     call normalize_accept_encoding;
     call annotate_request;
     return(hash);
 }
 
 sub vcl_backend_response {
-    set beresp.grace = 10m;
+    set beresp.grace = 30m;
     if (!beresp.ttl > 0s) {
         set beresp.http.X-Varnish-Action = "FETCH (pass - not cacheable)";
         set beresp.uncacheable = true;
