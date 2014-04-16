@@ -29,7 +29,7 @@ sub vcl_recv {
         # We only deal with GET and HEAD by default
         return(pass);
     }
-    if (req.http.host ~ "^(.*\.)?coraggio\.de$" || reg.http.host ~ "^(.*\.)?kreativkombinat.de$") {
+    if (req.http.host ~ "^(.*\.)?coraggio\.de$" || req.http.host ~ "^(.*\.)?kreativkombinat.de$") {
         # We do not cache sites in development
         return(pass);
     }
