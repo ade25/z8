@@ -1,8 +1,8 @@
 {
   "server": "zope8",
   "servername": "${hosts:public}",
-  "nginx": "1.7.0",
-  "varnish": "4.0.0",
+  "nginx": "1.7.4",
+  "varnish": "4.0.1",
   "haproxy": "1.5-dev25",
   "sites": [
     {
@@ -46,6 +46,12 @@
       "type": "plone",
       "port": "${ports:zope7}",
       "url": "${hosts:zope7}"
+    },
+    {
+      "title": "${sites:zope8}",
+      "type": "plone",
+      "port": "${ports:zope8}",
+      "url": "${hosts:zope8}"
     }
   ]
 }
