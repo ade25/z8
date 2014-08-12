@@ -27,6 +27,7 @@ env.hosted_sites = [
     '${sites:zope5}',
     '${sites:zope6}',
     '${sites:zope7}',
+    '${sites:zope8}',
 ]
 
 env.hosted_sites_locations = [
@@ -37,6 +38,7 @@ env.hosted_sites_locations = [
     '/opt/sites/${sites:zope5}/buildout.${sites:zope5}',
     '/opt/sites/${sites:zope6}/buildout.${sites:zope6}',
     '/opt/sites/${sites:zope7}/buildout.${sites:zope7}',
+    '/opt/sites/${sites:zope8}/buildout.${sites:zope8}',
 ]
 
 
