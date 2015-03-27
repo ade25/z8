@@ -27,3 +27,4 @@ etc/vhosts/*.conf
 src/ade25.fabfiles
 fabfile.py
 serverdetails.json
+.DS_Store
