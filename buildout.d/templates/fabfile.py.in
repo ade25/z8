@@ -10,7 +10,7 @@ from ade25.fabfiles.server import controls
 from ade25.fabfiles import hotfix as hf
 
 from slacker import Slacker
-slack = Slacker('xoxp-2440800772-2440800774-2520374751-468e84')
+slack = Slacker('${settings:slack-api-token}')
 
 env.use_ssh_config = True
 env.forward_agent = True
@@ -18,9 +18,11 @@ env.port = '22222'
 env.user = 'root'
 env.code_user = 'root'
 env.prod_user = 'www'
+env.hostname = '${fabric:hostname}'
 env.webserver = '/opt/webserver/buildout.webserver'
 env.code_root = '/opt/webserver/buildout.webserver'
 env.host_root = '/opt/sites'
+env.actor = ${settings:username}
 
 env.hosts = ['z8']
 env.hosted_sites = [
