@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "bin/letsencrypt", line 30, in <module>
+    sys.exit(letsencrypt.cli.main())
+  File "/Users/cb/.buildout/eggs/letsencrypt-0.2.0-py2.7.egg/letsencrypt/cli.py", line 1361, in main
+    "--strict-permissions" in cli_args)
+  File "/Users/cb/.buildout/eggs/letsencrypt-0.2.0-py2.7.egg/letsencrypt/le_util.py", line 103, in make_or_verify_dir
+    os.makedirs(directory, mode)
+  File "/Users/cb/ops/z8/bin/../lib/python2.7/os.py", line 157, in makedirs
+    mkdir(name, mode)
+OSError: [Errno 13] Permission denied: '/etc/letsencrypt'

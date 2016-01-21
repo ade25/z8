@@ -1,9 +1,9 @@
 {
   "server": "zope8",
   "servername": "${hosts:public}",
-  "nginx": "1.7.4",
-  "varnish": "4.0.1",
-  "haproxy": "1.5-dev25",
+  "nginx": "${component-versions:nginx}",
+  "varnish": "${component-versions:varnish}",
+  "haproxy": "${component-versions:haproxy}",
   "sites": [
     {
       "title": "${sites:zope1}",
