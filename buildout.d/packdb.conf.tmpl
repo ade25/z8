@@ -1,0 +1,36 @@
+# Pack ZODB Database for non ZEO installations
+#
+# The download should be triggered by a cronjob/shellscript by
+# using: wget --max-redirect 0 --post-data='submit=Pack&days:float=7.0' -i ${buildout:directory}/etc/packdb.conf
+#
+# The constucted download urls will look like:
+# wget --max-redirect 0 --post-data='submit=Pack&days:float=7.0' http://user:password@localhost:8080/Control_Panel/Database/main/manage_pack
+#
+# Note: The user and password need to be set from a local secret file
+# This means calling `bin/instance useradd ${passwords:dbpack-user} ${passwords:dbpack-secret}`
+# for each instance on the target machine
+
+####################
+# Instance pack urls
+####################
+
+# ${hosts:zope1}
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zope1}/Control_Panel/Database/main/manage_pack
+# ${hosts:zope2}
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zope2}/Control_Panel/Database/main/manage_pack
+# ${hosts:zope3}
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zope3}/Control_Panel/Database/main/manage_pack
+# ${hosts:zope4}
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zope4}/Control_Panel/Database/main/manage_pack
+# ${hosts:zope5}
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zope5}/Control_Panel/Database/main/manage_pack
+# ${hosts:zope6}
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zope6}/Control_Panel/Database/main/manage_pack
+# ${hosts:zope7}
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zope7}/Control_Panel/Database/main/manage_pack
+# ${hosts:zope8}
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zope8}/Control_Panel/Database/main/manage_pack
+# ${hosts:zope9}
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zope9}/Control_Panel/Database/main/manage_pack
+# ${hosts:zope10}
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zope10}/Control_Panel/Database/main/manage_pack
