@@ -33,7 +33,7 @@ env.hosted_sites = [
     '${sites:zope4}',
     '${sites:zope5}',
     '${sites:zope6}',
-#    '${sites:zope7}',
+    '${sites:zope7}',
     '${sites:zope8}',
     '${sites:zope9}',
     '${sites:zope10}',
