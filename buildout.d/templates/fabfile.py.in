@@ -34,6 +34,8 @@ env.hosted_sites = [
     '${sites:zope6}',
     '${sites:zope7}',
     '${sites:zope8}',
+    '${sites:zope9}',
+    '${sites:zope10}',
 ]
 
 env.hosted_sites_locations = [
@@ -45,6 +47,8 @@ env.hosted_sites_locations = [
     '/opt/sites/${sites:zope6}/buildout.${sites:zope6}',
     '/opt/sites/${sites:zope7}/buildout.${sites:zope7}',
     '/opt/sites/${sites:zope8}/buildout.${sites:zope8}',
+    '/opt/sites/${sites:zope8}/buildout.${sites:zope9}',
+    '/opt/sites/${sites:zope8}/buildout.${sites:zope10}',
 ]
 
 
@@ -120,6 +124,25 @@ def update(sitename=None, actor=None):
     user = 'fabric'
     icon = ':shipit:'
     slack.chat.post_message('#general', msg, username=user, icon_emoji=icon)
+
+
+@task
+def add_zodb_pack_user(user=None, password=None):
+    """ Add user to all hosted instances
+
+        @param user: Zope user allowed to pack databases
+        @param password: A password only needed for packing
+    """
+    if user is None:
+        print("A user is required")
+    for location in hosted_sites_locations:
+        with cd(location):
+            # Only process useradd when a custom secret.cfg is present
+            if exists('secret.cfg'):
+                print('Please take note of your credentials inside the secret.cfg')
+                run('bin/instance adduser {0} {1}'.format(user, password))
+            else:
+                print('A local secret.cfg is required for this task to process')
 
 
 @task
