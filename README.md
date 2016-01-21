@@ -154,8 +154,8 @@ to display host details.
 ```
 
 *Note:* you can simply copy the last server block in the template file, but
-make sure that you separate serverblocks via `,`. The correct syntax
-(simplified) would be:
+make sure that you separate all serverblocks but the last one via `,`.
+The correct syntax (simplified) would be:
 
 ``` json
 {
@@ -173,6 +173,27 @@ make sure that you separate serverblocks via `,`. The correct syntax
     }
   ]
 }
+```
+
+Update /buildout.d/templates/packdb.conf.tmpl
+---------------------------------------------
+
+Setup automatic database packing for the new instance by adding a line to
+the pack config
+
+```bash
+http://${passwords:dbpack-user}:${passwords:dbpack-secret}@localhost:${ports:zopeXX/Control_Panel/Database/main/manage_pack
+
+```
+
+Update /buildout.d/letsencrypt-cli.ini-.templ
+---------------------------------------------
+
+Add the new instance hostname to the ssl setup configuration by adding the
+servername to the list of managed domains
+
+```bash
+domains = zX.ade25.de, ..., ..., ${hosts:zopeXX}
 ```
 
 

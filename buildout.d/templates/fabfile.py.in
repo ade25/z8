@@ -4,6 +4,7 @@ from fabric.api import env
 from fabric.api import local
 from fabric.api import run
 from fabric.api import task
+from fabric.contrib.files import exists
 
 from ade25.fabfiles import project
 from ade25.fabfiles.server import controls
@@ -32,7 +33,7 @@ env.hosted_sites = [
     '${sites:zope4}',
     '${sites:zope5}',
     '${sites:zope6}',
-    '${sites:zope7}',
+#    '${sites:zope7}',
     '${sites:zope8}',
     '${sites:zope9}',
     '${sites:zope10}',
@@ -128,21 +129,26 @@ def update(sitename=None, actor=None):
 
 @task
 def add_zodb_pack_user(user=None, password=None):
-    """ Add user to all hosted instances
+    """ Add db pack user to all hosted instances
 
         @param user: Zope user allowed to pack databases
         @param password: A password only needed for packing
     """
     if user is None:
         print("A user is required")
-    for location in hosted_sites_locations:
+    if password is None:
+        print("A password is required")
+    print('Please take note of the credentials inside the secret.cfg')
+    for site in env.hosted_sites:
+        location = '/opt/sites/{0}/buildout.{0}'.format(site)
+        instance = 'instance-{0}'.format(site)
+        with cd(env.webserver):
+            run('bin/supervisorctl stop {0}'.format(instance))
         with cd(location):
-            # Only process useradd when a custom secret.cfg is present
-            if exists('secret.cfg'):
-                print('Please take note of your credentials inside the secret.cfg')
-                run('bin/instance adduser {0} {1}'.format(user, password))
-            else:
-                print('A local secret.cfg is required for this task to process')
+            run('bin/instance adduser {0} {1}'.format(user, password))
+        with cd(env.webserver):
+            run('bin/supervisorctl start {0}'.format(instance))
+    print('Database pack configured for all instances')
 
 
 @task
