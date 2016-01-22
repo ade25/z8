@@ -4,7 +4,7 @@
 # using: wget --max-redirect 0 --post-data='submit=Pack&days:float=7.0' -i ${buildout:directory}/etc/packdb.conf
 #
 # The constucted download urls will look like:
-# wget --max-redirect 0 --post-data='submit=Pack&days:float=7.0' http://user:password@localhost:8080/Control_Panel/Database/main/manage_pack
+# wget --max-redirect 0 --post-data='submit=Pack&days:float=7.0' --http-user=${passwords:dbpack-user} --http-passwd=${passwords:dbpack-secret} --auth-no-challenge -q -O http://user:password@localhost:8080/Control_Panel/Database/main/manage_pack
 #
 # Note: The user and password need to be set from a local secret file
 # This means calling `bin/instance useradd ${passwords:dbpack-user} ${passwords:dbpack-secret}`
