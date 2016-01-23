@@ -1,7 +1,7 @@
 #!/bin/bash
 
 web_service='nginx'
-config_file="/usr/local/etc/le-renew-webroot.ini"
+config_file="${buildout:directory}/etc/cli.ini"
 
 le_path='/opt/letsencrypt'
 exp_limit=30;
@@ -31,7 +31,7 @@ else
 	echo "The certificate for $domain is about to expire soon. Starting webroot renewal script..."
         $le_path/letsencrypt-auto certonly -a webroot --agree-tos --renew-by-default --config $config_file
 	echo "Reloading $web_service"
-	/usr/sbin/service $web_service reload
+	/opt/webserver/buildout.webserver/bin/supervisorctl reload $web_service
 	echo "Renewal process finished for domain $domain"
 	exit 0;
 fi
