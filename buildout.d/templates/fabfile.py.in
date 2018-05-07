@@ -1,17 +1,13 @@
-import getpass
 from fabric.api import cd
 from fabric.api import env
 from fabric.api import local
 from fabric.api import run
 from fabric.api import task
-from fabric.contrib.files import exists
 
 from ade25.fabfiles import project
+from ade25.fabfiles.server import setup
 from ade25.fabfiles.server import controls
 from ade25.fabfiles import hotfix as hf
-
-from slacker import Slacker
-slack = Slacker('${settings:slack-api-token}')
 
 env.use_ssh_config = True
 env.forward_agent = True
@@ -19,13 +15,11 @@ env.port = '22222'
 env.user = 'root'
 env.code_user = 'root'
 env.prod_user = 'www'
-env.hostname = '${fabric:hostname}'
 env.webserver = '/opt/webserver/buildout.webserver'
 env.code_root = '/opt/webserver/buildout.webserver'
 env.host_root = '/opt/sites'
-env.actor = ${settings:username}
 
-env.hosts = ['z8']
+env.hosts = ['${fabric:host}']
 env.hosted_sites = [
     '${sites:zope1}',
     '${sites:zope2}',
@@ -48,9 +42,15 @@ env.hosted_sites_locations = [
     '/opt/sites/${sites:zope6}/buildout.${sites:zope6}',
     '/opt/sites/${sites:zope7}/buildout.${sites:zope7}',
     '/opt/sites/${sites:zope8}/buildout.${sites:zope8}',
-    '/opt/sites/${sites:zope8}/buildout.${sites:zope9}',
-    '/opt/sites/${sites:zope8}/buildout.${sites:zope10}',
+    '/opt/sites/${sites:zope9}/buildout.${sites:zope9}',
+    '/opt/sites/${sites:zope10}/buildout.${sites:zope10}',
 ]
+
+
+@task
+def push():
+    """ Push committed local changes to git """
+    local('git push')
 
 
 @task
@@ -67,6 +67,13 @@ def restart_nginx():
 
 
 @task
+def nginx(*cmd):
+    """Runs an arbitrary supervisorctl command."""
+    with cd(env.webserver):
+        run('nice bin/supervisorctl ' + ' '.join(cmd) + ' nginx')
+
+
+@task
 def restart_varnish():
     """ Restart Varnish """
     controls.restart_varnish()
@@ -80,75 +87,32 @@ def restart_haproxy():
 
 @task
 def ctl(*cmd):
+    """ Runs an arbitrary supervisorctl command """
+    with cd(env.webserver):
+        run('nice bin/supervisorctl ' + ' '.join(cmd))
+
+@task
+def supervisorctl(*cmd):
     """Runs an arbitrary supervisorctl command."""
     with cd(env.webserver):
         run('nice bin/supervisorctl ' + ' '.join(cmd))
 
 
 @task
-def prepare_deploy():
-    """ Push committed local changes to git """
-    local('git push')
-
-
-@task
-def deploy(actor=None):
+def deploy():
     """ Deploy current master to production server """
-    opts = dict(
-        actor=actor or env.get('actor') or getpass.getuser(),
-    )
-    project.site.update()
-    project.site.build()
-    with cd(env.webserver):
-        run('bin/supervisorctl reread')
-        run('bin/supervisorctl update')
-    msg = '[s1] s1.ade25.de server configuration deployed by %(actor)s' % opts
-    user = 'fabric'
-    icon = ':shipit:'
-    slack.chat.post_message('#general', msg, username=user, icon_emoji=icon)
+    push()
+    controls.update()
+    controls.build()
 
 
 @task
-def update(sitename=None, actor=None):
-    """ Deploy changes to a hosted site """
-    opts = dict(
-        sitename=sitename,
-        actor=actor or env.get('actor') or getpass.getuser(),
-    )
-    path = '{0}/{1}/buildout.{2}'.format(env.host_root, sitename, sitename)
-    with cd(path):
-        run('nice git pull')
-        run('nice bin/buildout -Nc deployment.cfg')
-    with cd(env.webserver):
-        run('nice bin/supervisorctl restart instance-%(sitename)s' % opts)
-    msg = '[s1] %(sitename)s deployed by %(actor)s' % opts
-    user = 'fabric'
-    icon = ':shipit:'
-    slack.chat.post_message('#general', msg, username=user, icon_emoji=icon)
-
-
-@task
-def add_zodb_pack_user(user=None, password=None):
-    """ Add db pack user to all hosted instances
-
-        @param user: Zope user allowed to pack databases
-        @param password: A password only needed for packing
-    """
-    if user is None:
-        print("A user is required")
-    if password is None:
-        print("A password is required")
-    print('Please take note of the credentials inside the secret.cfg')
-    for site in env.hosted_sites:
-        location = '/opt/sites/{0}/buildout.{0}'.format(site)
-        instance = 'instance-{0}'.format(site)
-        with cd(env.webserver):
-            run('bin/supervisorctl stop {0}'.format(instance))
-        with cd(location):
-            run('bin/instance adduser {0} {1}'.format(user, password))
-        with cd(env.webserver):
-            run('bin/supervisorctl start {0}'.format(instance))
-    print('Database pack configured for all instances')
+def deploy_site():
+    """ Deploy a new site to production """
+    push()
+    controls.update()
+    controls.build()
+    controls.reload_supervisor()
 
 
 @task
