@@ -1,0 +1,5 @@
+# Enable nginx specific settings
+# All automatically generated files will be ignored
+!cache_control_assets.conf
+!disable_logging.conf
+!proxy_settings.conf
